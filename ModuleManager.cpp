@@ -34,7 +34,7 @@ CModuleManager::~CModuleManager()
 	m_vModules.clear();
 }
 
-bool CModuleManager::LoadRetroSpyModule(const char *name)
+bool CModuleManager::LoadMSModule(const char *name)
 {
 	CModule *module = NULL;
 
@@ -57,7 +57,7 @@ bool CModuleManager::LoadRetroSpyModule(const char *name)
 }
 
 
-bool CModuleManager::LoadRetroSpyModule(const char *name, ModuleConfigMap cfg)
+bool CModuleManager::LoadMSModule(const char *name, ModuleConfigMap cfg)
 {
 	CModule *module = NULL;
 

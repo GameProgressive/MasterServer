@@ -26,6 +26,10 @@
 #include <stdlib.h>
 #include <time.h>
 
+#if defined(_WIN32) && defined(_DEBUG)
+#include <vld.h>
+#endif
+
 #define CONFIG_NAME "MasterServer.ini"
 #define MASTERSERVER_VERSION "Dev1"
 

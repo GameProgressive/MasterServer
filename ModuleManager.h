@@ -34,23 +34,23 @@ public:
 	~CModuleManager();
 
 	/*
-		Function: LoadRetroSpyModule
+		Function: LoadMSModule
 		Description: Load a module and store it into the array
 		Return: true if the module is loaded, otherwise false
 		Parameters:
 			name => The name of the module to be loaded
 	*/
-	bool LoadRetroSpyModule(const char *name);
+	bool LoadMSModule(const char *name);
 
 	/*
-		Function: LoadRetroSpyModule
+		Function: LoadMSModule
 		Description: Load a module and store it into the array
 		Return: true if the module is loaded, otherwise false
 		Parameters:
 			name => The name of the module to be loaded
 			cfg => A map to the configuration
 	*/
-	bool LoadRetroSpyModule(const char *name, ModuleConfigMap cfg);
+	bool LoadMSModule(const char *name, ModuleConfigMap cfg);
 
 	/*
 		Function: Start

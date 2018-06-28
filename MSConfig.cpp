@@ -87,16 +87,17 @@ bool CConfig::Load(CModuleManager *mngr, const char *name)
 	// Load the modules
 	while (bC)
 	{
-		char name[21];
-
-		// Set the name
-		sprintf_s(name, 20, "Load%u", i);
+		char mn[15];
+		_snprintf_s(mn, sizeof(mn), 15, "%u", i);
 
 		// Try to get the module name
-		str = reader.Get("Modules", name, "NOT_FOUND");
+		str = reader.Get("Modules", mn, "NOT_FOUND");
 		
-		if (str ==  "NOT_FOUND")
+		if (str.compare("NOT_FOUND") == 0)
+		{
+			
 			bC = false; // This is the last module, exit
+		}
 		else
 		{
 			// Get the fields of the module section
@@ -104,7 +105,7 @@ bool CConfig::Load(CModuleManager *mngr, const char *name)
 
 			if (set.size() < 1)
 				// Just load without the configuration if we don't have any
-				mngr->LoadRetroSpyModule(str.c_str());
+				mngr->LoadMSModule(str.c_str());
 			else
 			{
 				ModuleConfigMap map;
@@ -120,7 +121,7 @@ bool CConfig::Load(CModuleManager *mngr, const char *name)
 				}
 
 				// Load the module with the config
-				mngr->LoadRetroSpyModule(str.c_str(), map);
+				mngr->LoadMSModule(str.c_str(), map);
 			}
 		}
 

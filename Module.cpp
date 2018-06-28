@@ -89,7 +89,7 @@ bool CModule::Load(const char *name)
 #endif
 	
 	// Save the name
-	strcpy_s(m_szName, MAX_MODULENAME, name);
+	strncpy_s(m_szName, sizeof(m_szName), name, MAX_MODULENAME);
 
 	// Load the Dynamic library
 #ifdef _WIN32
