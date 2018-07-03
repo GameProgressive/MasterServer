@@ -19,15 +19,9 @@
 #ifndef _MASTERSERVER_MODULE_H
 #define _MASTERSERVER_MODULE_H
 
-#include <MasterServerMDK.h>
+#include "Thread.h"
 
-// Include pthreads/WINAPI threading
-#ifdef _WIN32
-	#define WIN32_LEAN_AND_MEAN
-	#include <Windows.h>
-#else
-	#include <pthread.h>
-#endif
+#include <MasterServerMDK.h>
 
 #include <string>
 #include <map>
@@ -43,7 +37,7 @@ typedef bool (* Module_ConfigFunction)(ModuleConfigMap);
 	This class rappresents a dynamic module that will
 	be loaded into RetroSpy Main Server
 */
-class CModule
+class CModule : public CThread
 {
 public:
 	CModule();
@@ -82,23 +76,6 @@ public:
 	*/
 	void Stop();
 
-	/*
-		Function: IsRunning
-		Descrption: Checks if the module is running
-		Return: true if the module is running, otherwise false
-	*/
-	bool IsRunning();
-
-	/*
-		Function: GetThreadID
-		Description: Get the thread ID
-		Return: The thread ID
-	*/
-#ifdef _WIN32
-	DWORD getThreadID();
-#else
-	pthread_t getThreadID();
-#endif
 
 	/*
 		Function: GetName
@@ -114,13 +91,6 @@ public:
 	*/
 	const char *GetDatabaseStatus();
 
-	/*
-		Function: GetExitCode
-		Description: Get the exit code of the thread
-		Return: the exit code
-	*/
-	unsigned long GetExitCode();
-
 private:
 	char m_szName[MAX_MODULENAME+1];
 
@@ -128,19 +98,6 @@ private:
 	Module_ConfigFunction m_cbConfig;
 
 	ModuleMain m_module;
-
-	bool m_bRunning;
-
-#ifdef _WIN32
-	HANDLE m_handle;
-	DWORD m_threadID;
-	HMODULE m_lpThread;
-#else
-	pthread_t m_threadID;
-	void *m_lpThread;
-#endif
-
-	unsigned long m_exitCode;
 
 	mdk_mysql m_connection;
 	bool m_database_disabled;

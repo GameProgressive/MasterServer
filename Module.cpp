@@ -30,17 +30,8 @@
 
 CModule::CModule()
 {
-	m_bRunning = false;
-
-	m_threadID = 0;
-	m_lpThread = NULL;
-	
 	m_cbConfig = NULL;
 	m_cbMain = NULL;
-
-#ifdef _WIN32
-	m_handle = NULL;
-#endif
 
 	m_exitCode = 0;
 
@@ -165,22 +156,11 @@ void CModule::Start()
 		}
 	}
 	
-	// Create the module thread
 #ifdef _WIN32
-	m_handle = CreateThread(0, 0, (LPTHREAD_START_ROUTINE)m_cbMain, (void*)&m_module, 0, &m_threadID);
-
-	if (m_handle)
-		m_bRunning = true;
+	StartThread((LPTHREAD_START_ROUTINE)m_cbMain, (void*)&m_module);
 #else
-	pthread_attr_t attr;
-	pthread_attr_init(&attr);
-	pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
-	
-	if (!pthread_create(&m_threadID, &attr,(void*(*)(void*)) m_cbMain, (void*)&m_module))
-		m_bRunning = true;
+	StartThread((void*(*)(void*))m_cbMain, (void*)&m_module);	
 #endif
-
-	UpdateThreadInformation();
 }
 
 const char *CModule::GetDatabaseStatus()
@@ -193,67 +173,13 @@ const char *CModule::GetDatabaseStatus()
 
 void CModule::Stop()
 {
-	UpdateThreadInformation();
-
-	if (!m_bRunning)
-		return;
-
-	m_bRunning = false;
-
-	// Terminate the thread
-#ifdef _WIN32
-	TerminateThread(m_handle, 0);
-	m_handle = NULL; //SET THIS TO NULL OTHERWISE THE APP WILL CRASH
-#else
-	pthread_kill(m_threadID, SIGKILL);
-#endif
-	m_threadID = 0;
+	StopThread();
 	
 	// Close MySQL connection
 	Database::Disconnect(&m_connection);
 }
 
-#ifdef _WIN32
-DWORD CModule::getThreadID()
-#else
-pthread_t CModule::getThreadID()
-#endif
-{
-	return m_threadID;
-}
-
-bool CModule::IsRunning()
-{
-	UpdateThreadInformation();
-
-	return m_bRunning;
-}
-
 const char *CModule::GetName()
 {
 	return m_szName;
-}
-
-unsigned long CModule::GetExitCode()
-{
-	return m_exitCode;
-}
-
-void CModule::UpdateThreadInformation()
-{
-	if (!m_handle)
-		return;
-
-#ifdef _WIN32
-	if (!GetExitCodeThread(m_handle, &m_exitCode))
-		return;
-
-	if (m_exitCode == ERROR_STILL_ALIVE)
-		m_bRunning = true;
-	else
-		m_bRunning = false;
-
-#else
-#error "REQUIRE POSIX PORTING"
-#endif
 }

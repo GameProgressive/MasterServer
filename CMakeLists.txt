@@ -43,6 +43,8 @@ ${CMAKE_CURRENT_LIST_DIR}/Module.cpp
 ${CMAKE_CURRENT_LIST_DIR}/Module.h
 ${CMAKE_CURRENT_LIST_DIR}/ModuleManager.cpp
 ${CMAKE_CURRENT_LIST_DIR}/ModuleManager.h
+${CMAKE_CURRENT_LIST_DIR}/Thread.cpp
+${CMAKE_CURRENT_LIST_DIR}/Thread.h
 )
 
 if (WIN32)

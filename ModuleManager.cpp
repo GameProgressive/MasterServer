@@ -20,7 +20,6 @@
 
 CModuleManager::CModuleManager()
 {
-
 }
 
 CModuleManager::~CModuleManager()
