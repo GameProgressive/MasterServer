@@ -29,7 +29,7 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 ## Module Development Kit
 add_subdirectory("MDK")
-include_directories("MDK")
+include_directories("MDK/include")
 
 set(SOURCES
 ${CMAKE_CURRENT_LIST_DIR}/MSConfig.cpp

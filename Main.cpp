@@ -18,7 +18,6 @@
 */
 #include "ModuleManager.h"
 #include "MSConfig.h"
-#include "Database.h"
 
 #include <iostream>
 #include <string>

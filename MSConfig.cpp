@@ -20,7 +20,7 @@
 
 #include "INIReader.h"
 
-#include <MasterServerMDK.h>
+#include <MDK/MasterServerMDK.h>
 #include <stdio.h>
 
 const char *CConfig::GetDatabaseName()

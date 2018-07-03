@@ -21,7 +21,7 @@
 
 #include "Thread.h"
 
-#include <MasterServerMDK.h>
+#include <MDK/MasterServerMDK.h>
 
 #include <string>
 #include <map>
