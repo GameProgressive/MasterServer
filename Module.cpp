@@ -36,6 +36,10 @@ CModule::CModule()
 
 	m_database_disabled = false;
 
+	m_module.ip = NULL;
+	m_module.port = 0;
+	m_module.mysql = NULL;
+
 	Database::Init(&m_connection);
 }
 
@@ -64,12 +68,13 @@ bool CModule::Load(const char *name, ModuleConfigMap cfg)
 
 bool CModule::Load(const char *name)
 {
-	std::string dllName = "";
+	std::string dllName = ".";
 	
 #ifndef _WIN32
-	dllName += "lib";
+	dllName += "/lib";
+#else
+	dllName += "\\";
 #endif
-
 	dllName += name;
 
 #ifdef _WIN32
@@ -146,11 +151,11 @@ void CModule::Start()
 		if (!m_database_disabled)
 		{
 			if (CConfig::GetDatabaseSocket())
-				if (Database::Connect(&m_connection, CConfig::GetDatabaseSocket(), CConfig::GetDatabaseUsername(), CConfig::GetDatabaseName(), CConfig::GetDatabasePassword()))
-					m_module.mysql = &m_connection;
+				if (Database::Connect(m_connection, CConfig::GetDatabaseSocket(), CConfig::GetDatabaseUsername(), CConfig::GetDatabaseName(), CConfig::GetDatabasePassword()))
+					m_module.mysql = m_connection;
 			else
-				if (Database::Connect(&m_connection, CConfig::GetDatabaseHost(), CConfig::GetDatabasePort(), CConfig::GetDatabaseUsername(), CConfig::GetDatabaseName(), CConfig::GetDatabasePassword()))
-					m_module.mysql = &m_connection;
+				if (Database::Connect(m_connection, CConfig::GetDatabaseHost(), CConfig::GetDatabasePort(), CConfig::GetDatabaseUsername(), CConfig::GetDatabaseName(), CConfig::GetDatabasePassword()))
+					m_module.mysql = m_connection;
 				
 		}
 	}
@@ -167,7 +172,7 @@ const char *CModule::GetDatabaseStatus()
 	if (m_database_disabled)
 		return "Disabled";
 	
-	return Database::IsConnected(&m_connection) ? "Connected " : "Disconnected";
+	return Database::IsConnected(m_connection) ? "Connected " : "Disconnected";
 }
 
 void CModule::Stop()
@@ -175,7 +180,8 @@ void CModule::Stop()
 	StopThread();
 	
 	// Close MySQL connection
-	Database::Disconnect(&m_connection);
+	Database::Disconnect(m_connection);
+	m_connection = NULL;
 }
 
 const char *CModule::GetName()
