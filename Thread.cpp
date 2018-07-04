@@ -98,6 +98,7 @@ void CThread::UpdateThreadInformation()
 		m_bRunning = false;
 
 #else
-#error "REQUIRE POSIX PORTING"
+	m_bRunning = true;
+	m_exitCode = ERROR_LINUX_UNSUPPORTED_RESERVED;
 #endif
 }
