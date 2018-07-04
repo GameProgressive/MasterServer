@@ -54,3 +54,4 @@ endif()
 
 add_executable(MasterServer ${SOURCES})
 target_link_libraries(MasterServer MDK)
+#set_target_properties(MasterServer PROPERTIES LINK_FLAGS "/MANIFESTUAC:\"level='requireAdministrator' uiAccess='false'\"")
