@@ -35,22 +35,22 @@ CModuleManager::~CModuleManager()
 
 bool CModuleManager::LoadMSModule(const char *name)
 {
-	CModule *module = NULL;
-
-	// Add the pointer into the vector
-	m_vModules.push_back(new CModule());
+	CModule *module = new CModule();
 
 	// Get the module
-	module = m_vModules.at(m_vModules.size() - 1);
+	//module = m_vModules.at(m_vModules.size() - 1);
 
 	// Try to load the module
 	if (!module->Load(name))
 	{
 		delete module;
 		// Remove the module from the array
-		m_vModules.erase(m_vModules.begin()+(m_vModules.size()-1));
+		//m_vModules.erase(m_vModules.begin()+(m_vModules.size()-1));
 		return false;
 	}
+
+	// Add the pointer into the vector
+	m_vModules.push_back(module);
 
 	return true;
 }
@@ -58,22 +58,22 @@ bool CModuleManager::LoadMSModule(const char *name)
 
 bool CModuleManager::LoadMSModule(const char *name, ModuleConfigMap cfg)
 {
-	CModule *module = NULL;
-
-	// Add the pointer into the vector
-	m_vModules.push_back(new CModule());
+	CModule *module = new CModule();
 
 	// Get the module
-	module = m_vModules.at(m_vModules.size() - 1);
+	//module = m_vModules.at(m_vModules.size() - 1);
 
 	// Try to load the module
 	if (!module->Load(name, cfg))
 	{
 		delete module;
 		// Remove the module from the array
-		m_vModules.erase(m_vModules.begin()+(m_vModules.size()-1));
+		//m_vModules.erase(m_vModules.begin()+(m_vModules.size()-1));
 		return false;
 	}
+
+	// Add the pointer into the vector
+	m_vModules.push_back(module);
 
 	return true;
 }

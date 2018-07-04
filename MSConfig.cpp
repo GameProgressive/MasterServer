@@ -76,13 +76,13 @@ bool CConfig::Load(CModuleManager *mngr, const char *name)
 	// Load the Database section
 	m_DBPort = reader.GetInteger("Database", "Port", 3306);
 
-	strcpy_s(m_szDBName, MAX_INI_BUFFER, reader.Get("Database", "Name", "gamespy").c_str());
-	strcpy_s(m_szDBPass, MAX_INI_BUFFER, reader.Get("Database", "Password", "").c_str());
-	strcpy_s(m_szDBUser, MAX_INI_BUFFER, reader.Get("Database", "Username", "gamespy").c_str());
-	strcpy_s(m_szDBHost, MAX_INI_BUFFER, reader.Get("Database", "Host", "localhost").c_str());
-	strcpy_s(m_szDBSock, MAX_INI_BUFFER, reader.Get("Database", "Socket", "").c_str());
+	strncpy_s(m_szDBName, sizeof(m_szDBName), reader.Get("Database", "Name", "gamespy").c_str(), MAX_INI_BUFFER);
+	strncpy_s(m_szDBPass, sizeof(m_szDBPass), reader.Get("Database", "Password", "").c_str(), MAX_INI_BUFFER);
+	strncpy_s(m_szDBUser, sizeof(m_szDBUser), reader.Get("Database", "Username", "gamespy").c_str(), MAX_INI_BUFFER);
+	strncpy_s(m_szDBHost, sizeof(m_szDBHost), reader.Get("Database", "Host", "localhost").c_str(), MAX_INI_BUFFER);
+	strncpy_s(m_szDBSock, sizeof(m_szDBSock), reader.Get("Database", "Socket", "").c_str(), MAX_INI_BUFFER);
 
-	strcpy_s(m_szDIP, MAX_INI_BUFFER, reader.Get("Server", "DefaultIP", "localhost").c_str());
+	strncpy_s(m_szDIP, sizeof(m_szDIP), reader.Get("Server", "DefaultIP", "localhost").c_str(), MAX_INI_BUFFER);
 
 	// Load the modules
 	while (bC)
@@ -91,7 +91,7 @@ bool CConfig::Load(CModuleManager *mngr, const char *name)
 		_snprintf_s(mn, sizeof(mn), 15, "%u", i);
 
 		// Try to get the module name
-		str = reader.Get("Modules", mn, "NOT_FOUND");
+		str = reader.Get("Modules", std::string(mn), "NOT_FOUND");
 		
 		if (str.compare("NOT_FOUND") == 0)
 		{
