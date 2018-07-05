@@ -46,7 +46,7 @@ void ConsolePause();
 
 // Commands
 void _PrintHelp();
-void _PrintModuleInfo(CModuleManager mngr);
+void _PrintModuleInfo(CModuleManager* mngr);
 
 bool Main_Running = true;
 
@@ -106,7 +106,7 @@ int main()
 		else if (strcmp(consoleInput.c_str(), "help") == 0)
 			_PrintHelp();
 		else if (strcmp(consoleInput.c_str(), "moduleinfo") == 0)
-			_PrintModuleInfo(mm);
+			_PrintModuleInfo(&mm);
 		else
 			LOG_WARN("MasterServer", "Unknown command \"%s\"", consoleInput.c_str());
 
@@ -164,16 +164,16 @@ const char* ExitCodeToString(unsigned long ecode)
 	Function: _PrintModuleInfo
 	Description: Print the status of the modules
 */
-void _PrintModuleInfo(CModuleManager mngr)
+void _PrintModuleInfo(CModuleManager* mngr)
 {
-	LOG_INFO("MasterServer", "Loaded modules: %u", mngr.GetModuleSize());
+	LOG_INFO("MasterServer", "Loaded modules: %u", mngr->GetModuleSize());
 
-	if (mngr.GetModuleSize() > 0)
+	if (mngr->GetModuleSize() > 0)
 	{
 		size_t i = 0;
-		for (; i < mngr.GetModuleSize(); i++)
+		for (; i < mngr->GetModuleSize(); i++)
 		{
-			CModule *m = mngr.GetModule(i);
+			CModule *m = mngr->GetModule(i);
 			LOG_INFO("MasterServer", "Module %u: %s   Status: %s (Code: %s)   Database Status: %s", i, m->GetName(), m->IsRunning() ? "Running" : "Stopped", ExitCodeToString(m->GetExitCode()), m->GetDatabaseStatus());
 		}
 	}
