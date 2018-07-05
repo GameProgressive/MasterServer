@@ -40,7 +40,10 @@ CModule::CModule()
 	m_module.port = 0;
 	m_module.mysql = NULL;
 
-	Database::Init(&m_connection);
+	m_connection = NULL;
+	
+	if (CConfig::IsDatabaseEnabled())
+		Database::Init(&m_connection);
 }
 
 CModule::~CModule()
@@ -135,6 +138,7 @@ void CModule::Start()
 	}
 	
 	// Connect to MySQL server
+	if (CConfig::IsDatabaseEnabled())
 	{
 		ModuleConfigMap::iterator it = m_module.cfg.find("DisableMySQL");
 		

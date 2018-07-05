@@ -58,6 +58,11 @@ const char *CConfig::GetDatabaseSocket()
 	return m_szDBSock;
 }
 
+bool CConfig::IsDatabaseEnabled()
+{
+	return m_dbenb;
+}
+
 bool CConfig::Load(CModuleManager *mngr, const char *name)
 {
 	// Create an INI instance
@@ -74,16 +79,24 @@ bool CConfig::Load(CModuleManager *mngr, const char *name)
 		return false;
 
 	// Load the Database section
-	m_DBPort = reader.GetInteger("Database", "Port", 3306);
+	if (reader.GetInteger("Database", "Enabled", 1) == 1)
+	{
+		m_DBPort = reader.GetInteger("Database", "Port", 3306);
+		if (m_DBPort < 0 || m_DBPort > 65535)
+			m_DBPort = 3306;
 
-	strncpy_s(m_szDBName, sizeof(m_szDBName), reader.Get("Database", "Name", "gamespy").c_str(), MAX_INI_BUFFER);
-	strncpy_s(m_szDBPass, sizeof(m_szDBPass), reader.Get("Database", "Password", "").c_str(), MAX_INI_BUFFER);
-	strncpy_s(m_szDBUser, sizeof(m_szDBUser), reader.Get("Database", "Username", "gamespy").c_str(), MAX_INI_BUFFER);
-	strncpy_s(m_szDBHost, sizeof(m_szDBHost), reader.Get("Database", "Host", "localhost").c_str(), MAX_INI_BUFFER);
-	strncpy_s(m_szDBSock, sizeof(m_szDBSock), reader.Get("Database", "Socket", "").c_str(), MAX_INI_BUFFER);
+		strncpy_s(m_szDBName, sizeof(m_szDBName), reader.Get("Database", "Name", "masterserver").c_str(), MAX_INI_BUFFER);
+		strncpy_s(m_szDBPass, sizeof(m_szDBPass), reader.Get("Database", "Password", "").c_str(), MAX_INI_BUFFER);
+		strncpy_s(m_szDBUser, sizeof(m_szDBUser), reader.Get("Database", "Username", "masterserver").c_str(), MAX_INI_BUFFER);
+		strncpy_s(m_szDBHost, sizeof(m_szDBHost), reader.Get("Database", "Host", "localhost").c_str(), MAX_INI_BUFFER);
+		strncpy_s(m_szDBSock, sizeof(m_szDBSock), reader.Get("Database", "Socket", "").c_str(), MAX_INI_BUFFER);
 
-	strncpy_s(m_szDIP, sizeof(m_szDIP), reader.Get("Server", "DefaultIP", "localhost").c_str(), MAX_INI_BUFFER);
-
+		strncpy_s(m_szDIP, sizeof(m_szDIP), reader.Get("Server", "DefaultIP", "localhost").c_str(), MAX_INI_BUFFER);
+		m_dbenb = true;
+	}
+	else
+		m_dbenb = false;
+	
 	// Load the modules
 	while (bC)
 	{
@@ -139,3 +152,4 @@ char CConfig::m_szDBPass[MAX_INI_BUFFER+1] = {0};
 char CConfig::m_szDBSock[MAX_INI_BUFFER+1] = {0};
 char CConfig::m_szDBName[MAX_INI_BUFFER+1] = {0};
 char CConfig::m_szDIP[MAX_INI_BUFFER+1] = {0};
+bool CConfig::m_dbenb = false;

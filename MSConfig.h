@@ -33,6 +33,7 @@ public:
 	static int GetDatabasePort();
 	static const char *GetDatabaseName();
 	static const char *GetDatabaseUsername();
+	static bool IsDatabaseEnabled();
 	
 	static bool Load(CModuleManager *mngr, const char *name);
 private:
@@ -43,6 +44,7 @@ private:
 	static char m_szDBSock[MAX_INI_BUFFER+1];
 	static char m_szDBName[MAX_INI_BUFFER+1];
 	static char m_szDIP[MAX_INI_BUFFER+1];
+	static bool m_dbenb;
 
 };
 
