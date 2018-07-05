@@ -101,9 +101,9 @@ bool CModule::Load(const char *name)
 
 	// Load the functions
 #ifdef _WIN32
-	m_cbMain = (Module_EntryPoint)GetProcAddress(m_lpThread, "RetroSpyMain");
+	m_cbMain = (Module_EntryPoint)GetProcAddress(m_lpThread, "MDKModule");
 #else
-	m_cbMain = (Module_EntryPoint)dlsym(m_lpThread, "RetroSpyMain");
+	m_cbMain = (Module_EntryPoint)dlsym(m_lpThread, "MDKModule");
 #endif
 
 	if (!m_cbMain)
