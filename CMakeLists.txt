@@ -27,9 +27,13 @@ endif()
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
+option(WITH_MDK "Build MDK from the local clone")
+
 ## Module Development Kit
+if (WITH_MDK)
 add_subdirectory("MDK")
 include_directories("MDK/include")
+endif()
 
 set(SOURCES
 ${CMAKE_CURRENT_LIST_DIR}/MSConfig.cpp
