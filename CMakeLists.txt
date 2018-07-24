@@ -35,6 +35,15 @@ add_subdirectory("MDK")
 include_directories("MDK/include")
 endif()
 
+if (MSVC)
+check_include_file(vld.h HAVE_VLD_H)
+
+if (HAVE_VLD_H)
+add_definition(-DHAVE_VLD_H)
+endif()
+
+endif()
+
 set(SOURCES
 ${CMAKE_CURRENT_LIST_DIR}/MSConfig.cpp
 ${CMAKE_CURRENT_LIST_DIR}/MSConfig.h
