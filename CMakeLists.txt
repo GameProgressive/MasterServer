@@ -39,7 +39,7 @@ if (MSVC)
 check_include_file(vld.h HAVE_VLD_H)
 
 if (HAVE_VLD_H)
-add_definition(-DHAVE_VLD_H)
+add_definitions(-DHAVE_VLD_H)
 endif()
 
 endif()
