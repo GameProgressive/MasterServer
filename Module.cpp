@@ -154,13 +154,14 @@ void CModule::Start()
 		{
 			m_database = new CDatabase();
 			
-			if (CConfig::GetDatabaseSocket())
+			if (CConfig::GetDatabaseSocket()[0] != '\0')
 				if (m_database->Connect(CConfig::GetDatabaseType(), CConfig::GetDatabaseSocket(), -1, CConfig::GetDatabaseUsername(), CConfig::GetDatabaseName(), CConfig::GetDatabasePassword()))
 					m_module.db = m_database;
 			else
 				if (m_database->Connect(CConfig::GetDatabaseType(), CConfig::GetDatabaseHost(), CConfig::GetDatabasePort(), CConfig::GetDatabaseUsername(), CConfig::GetDatabaseName(), CConfig::GetDatabasePassword()))
 					m_module.db = m_database;
 				
+			m_module.db = m_database;
 		}
 	}
 	

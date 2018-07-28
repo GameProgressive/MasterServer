@@ -53,20 +53,12 @@ bool CConfig::Load(CModuleManager *mngr, const char *name)
 		strncpy_s(m_szDBHost, sizeof(m_szDBHost), reader.Get("Database", "Host", "localhost").c_str(), MAX_INI_BUFFER);
 		strncpy_s(m_szDBSock, sizeof(m_szDBSock), reader.Get("Database", "Socket", "").c_str(), MAX_INI_BUFFER);
 
-#ifdef __MARIADB__
 		strncpy_s(dbType, sizeof(dbType), reader.Get("Database", "Type", "MariaDB").c_str(), MAX_INI_BUFFER);
-#elif defined(__SQLITE__)
-		strncpy_s(dbType, sizeof(dbType), reader.Get("Database", "Type", "SQLite").c_str(), MAX_INI_BUFFER);
-#endif
 
-#ifdef __MARIADB__
 		if (strcmp("MariaDB", dbType) == 0)
 			m_eDatabaseType = DATABASE_TYPE_MARIADB;
-#endif
-#ifdef __SQLITE__
-		if (strcmp("SQLite", dbType) == 0)
+		else if (strcmp("SQLite", dbType) == 0)
 			m_eDatabaseType = DATABASE_TYPE_SQLITE;
-#endif
 		
 		strncpy_s(m_szDBIP, sizeof(m_szDBIP), reader.Get("Server", "DefaultIP", "localhost").c_str(), MAX_INI_BUFFER);
 		m_bDBEnabled = true;
