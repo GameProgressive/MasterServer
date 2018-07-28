@@ -20,48 +20,7 @@
 
 #include "INIReader.h"
 
-#include <MDK/MasterServerMDK.h>
 #include <stdio.h>
-
-const char *CConfig::GetDatabaseName()
-{
-	return m_szDBName;
-}
-
-int CConfig::GetDatabasePort()
-{
-	return m_DBPort;
-}
-
-const char *CConfig::GetDatabaseUsername()
-{
-	return m_szDBUser;
-}
-
-const char *CConfig::GetDatabasePassword()
-{
-	return m_szDBPass;
-}
-
-const char *CConfig::GetDatabaseHost()
-{
-	return m_szDBHost;
-}
-
-const char *CConfig::GetDefaultIP()
-{
-	return m_szDIP;
-}
-
-const char *CConfig::GetDatabaseSocket()
-{
-	return m_szDBSock;
-}
-
-bool CConfig::IsDatabaseEnabled()
-{
-	return m_dbenb;
-}
 
 bool CConfig::Load(CModuleManager *mngr, const char *name)
 {
@@ -81,6 +40,9 @@ bool CConfig::Load(CModuleManager *mngr, const char *name)
 	// Load the Database section
 	if (reader.GetInteger("Database", "Enabled", 1) == 1)
 	{
+		char dbType[MAX_INI_BUFFER+1];
+		dbType[0] = '\0';
+		
 		m_DBPort = reader.GetInteger("Database", "Port", 3306);
 		if (m_DBPort < 0 || m_DBPort > 65535)
 			m_DBPort = 3306;
@@ -91,11 +53,26 @@ bool CConfig::Load(CModuleManager *mngr, const char *name)
 		strncpy_s(m_szDBHost, sizeof(m_szDBHost), reader.Get("Database", "Host", "localhost").c_str(), MAX_INI_BUFFER);
 		strncpy_s(m_szDBSock, sizeof(m_szDBSock), reader.Get("Database", "Socket", "").c_str(), MAX_INI_BUFFER);
 
-		strncpy_s(m_szDIP, sizeof(m_szDIP), reader.Get("Server", "DefaultIP", "localhost").c_str(), MAX_INI_BUFFER);
-		m_dbenb = true;
+#ifdef __MARIADB__
+		strncpy_s(dbType, sizeof(dbType), reader.Get("Database", "Type", "MariaDB").c_str(), MAX_INI_BUFFER);
+#elif defined(__SQLITE__)
+		strncpy_s(dbType, sizeof(dbType), reader.Get("Database", "Type", "SQLite").c_str(), MAX_INI_BUFFER);
+#endif
+
+#ifdef __MARIADB__
+		if (strcmp("MariaDB", dbType) == 0)
+			m_eDatabaseType = DATABASE_TYPE_MARIADB;
+#endif
+#ifdef __SQLITE__
+		if (strcmp("SQLite", dbType) == 0)
+			m_eDatabaseType = DATABASE_TYPE_SQLITE;
+#endif
+		
+		strncpy_s(m_szDBIP, sizeof(m_szDBIP), reader.Get("Server", "DefaultIP", "localhost").c_str(), MAX_INI_BUFFER);
+		m_bDBEnabled = true;
 	}
 	else
-		m_dbenb = false;
+		m_bDBEnabled = false;
 	
 	// Load the modules
 	while (bC)
@@ -151,5 +128,11 @@ char CConfig::m_szDBUser[MAX_INI_BUFFER+1] = {0};
 char CConfig::m_szDBPass[MAX_INI_BUFFER+1] = {0};
 char CConfig::m_szDBSock[MAX_INI_BUFFER+1] = {0};
 char CConfig::m_szDBName[MAX_INI_BUFFER+1] = {0};
-char CConfig::m_szDIP[MAX_INI_BUFFER+1] = {0};
-bool CConfig::m_dbenb = false;
+char CConfig::m_szDBIP[MAX_INI_BUFFER+1] = {0};
+bool CConfig::m_bDBEnabled = false;
+
+#ifdef __MARIADB__
+EDatabaseType CConfig::m_eDatabaseType = DATABASE_TYPE_MARIADB;
+#elif defined(__SQLITE__)
+EDatabaseType CConfig::m_eDatabaseType = DATABASE_TYPE_SQLITE;
+#endif

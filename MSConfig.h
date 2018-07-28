@@ -26,14 +26,15 @@
 class CConfig
 {
 public:
-	static const char *GetDatabaseSocket();
-	static const char *GetDefaultIP();
-	static const char *GetDatabaseHost();
-	static const char *GetDatabasePassword();
-	static int GetDatabasePort();
-	static const char *GetDatabaseName();
-	static const char *GetDatabaseUsername();
-	static bool IsDatabaseEnabled();
+	inline static const char *GetDatabaseSocket() { return m_szDBSock; }
+	inline static const char *GetDefaultIP() { return m_szDBIP; }
+	inline static const char *GetDatabaseHost() { return m_szDBHost; }
+	inline static const char *GetDatabasePassword() { return m_szDBPass; }
+	inline static int GetDatabasePort() { return m_DBPort; }
+	inline static const char *GetDatabaseName() { return m_szDBName; }
+	inline static const char *GetDatabaseUsername() { return m_szDBUser; }
+	inline static bool IsDatabaseEnabled() { return m_bDBEnabled; }
+	inline static EDatabaseType GetDatabaseType() { return m_eDatabaseType; }
 	
 	static bool Load(CModuleManager *mngr, const char *name);
 private:
@@ -43,9 +44,10 @@ private:
 	static char m_szDBPass[MAX_INI_BUFFER+1];
 	static char m_szDBSock[MAX_INI_BUFFER+1];
 	static char m_szDBName[MAX_INI_BUFFER+1];
-	static char m_szDIP[MAX_INI_BUFFER+1];
-	static bool m_dbenb;
-
+	static char m_szDBIP[MAX_INI_BUFFER+1];
+	static bool m_bDBEnabled;
+	static EDatabaseType m_eDatabaseType;
+	
 };
 
 #endif

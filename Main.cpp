@@ -19,6 +19,8 @@
 #include "ModuleManager.h"
 #include "MSConfig.h"
 
+#include <MDK/Utility.h>
+
 #include <iostream>
 #include <string>
 

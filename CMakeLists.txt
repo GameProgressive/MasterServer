@@ -18,6 +18,8 @@
 cmake_minimum_required(VERSION 2.8)
 project("MasterServer")
 
+include(CheckIncludeFiles)
+
 # Add definitions for w32 build that dosen't support _WIN32 macro
 if (WIN32)
 	add_definitions("-DWIN32 -D__WIN32__")
@@ -27,16 +29,8 @@ endif()
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
-option(WITH_MDK "Build MDK from the local clone")
-
-## Module Development Kit
-if (WITH_MDK)
-add_subdirectory("MDK")
-include_directories("MDK/include")
-endif()
-
 if (MSVC)
-check_include_file(vld.h HAVE_VLD_H)
+check_include_files(vld.h HAVE_VLD_H)
 
 if (HAVE_VLD_H)
 add_definitions(-DHAVE_VLD_H)

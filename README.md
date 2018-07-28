@@ -1,7 +1,11 @@
 # MasterServer
 
-GameProgressive Master Server. A "Multi-Server" container that works with MDK.
+### What is this
+MasterServer cominucate to the Database and enstablish a connection to it, then it sends the connection
+back to the Submodules (like PlayerSpy,QueryReport2).
 
-Pull requests and Issues are welcome.
+This allows to control all modules and database connection in just one program rather than have multiple
+windows for each submodule.
 
-See [the wiki](https://github.com/GameProgressive/MasterServer/wiki) for information about setting it up.
+### Setting up
+See [the wiki](https://github.com/GameProgressive/MasterServer/wiki) for information.

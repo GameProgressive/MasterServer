@@ -21,6 +21,8 @@
 
 #include <stdio.h>
 
+#include <MDK/Utility.h>
+
 #ifndef _WIN32
 #include <dlfcn.h>
 #include <pthread.h>
@@ -34,16 +36,11 @@ CModule::CModule()
 
 	m_exitCode = 0;
 
-	m_database_disabled = false;
-
 	m_module.ip = NULL;
 	m_module.port = 0;
-	m_module.mysql = NULL;
+	m_module.db = NULL;
 
-	m_connection = NULL;
-	
-	if (CConfig::IsDatabaseEnabled())
-		Database::Init(&m_connection);
+	m_database = NULL;
 }
 
 CModule::~CModule()
@@ -140,26 +137,29 @@ void CModule::Start()
 	// Connect to MySQL server
 	if (CConfig::IsDatabaseEnabled())
 	{
+		bool database_disabled = false;
 		ModuleConfigMap::iterator it = m_module.cfg.find("DisableMySQL");
 		
-		m_module.mysql = NULL;
+		m_module.db = NULL;
 		
 		if (it != m_module.cfg.end())
 		{
 			if (it->second.compare("1") == 0)
 			{
-				m_database_disabled = true;
+				database_disabled = true;
 			}
 		}
 		
-		if (!m_database_disabled)
+		if (!database_disabled)
 		{
+			m_database = new CDatabase();
+			
 			if (CConfig::GetDatabaseSocket())
-				if (Database::Connect(m_connection, CConfig::GetDatabaseSocket(), CConfig::GetDatabaseUsername(), CConfig::GetDatabaseName(), CConfig::GetDatabasePassword()))
-					m_module.mysql = m_connection;
+				if (m_database->Connect(CConfig::GetDatabaseType(), CConfig::GetDatabaseSocket(), -1, CConfig::GetDatabaseUsername(), CConfig::GetDatabaseName(), CConfig::GetDatabasePassword()))
+					m_module.db = m_database;
 			else
-				if (Database::Connect(m_connection, CConfig::GetDatabaseHost(), CConfig::GetDatabasePort(), CConfig::GetDatabaseUsername(), CConfig::GetDatabaseName(), CConfig::GetDatabasePassword()))
-					m_module.mysql = m_connection;
+				if (m_database->Connect(CConfig::GetDatabaseType(), CConfig::GetDatabaseHost(), CConfig::GetDatabasePort(), CConfig::GetDatabaseUsername(), CConfig::GetDatabaseName(), CConfig::GetDatabasePassword()))
+					m_module.db = m_database;
 				
 		}
 	}
@@ -173,10 +173,10 @@ void CModule::Start()
 
 const char *CModule::GetDatabaseStatus()
 {
-	if (m_database_disabled)
+	if (!m_database)
 		return "Disabled";
 	
-	return Database::IsConnected(m_connection) ? "Connected " : "Disconnected";
+	return m_database->IsConnected() ? "Connected " : "Disconnected";
 }
 
 void CModule::Stop()
@@ -184,11 +184,11 @@ void CModule::Stop()
 	StopThread();
 	
 	// Close MySQL connection
-	Database::Disconnect(m_connection);
-	m_connection = NULL;
-}
-
-const char *CModule::GetName()
-{
-	return m_szName;
+	if (m_database)
+	{
+		m_database->Disconnect();
+		delete m_database;
+	}
+	
+	m_database = NULL;
 }

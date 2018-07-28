@@ -21,7 +21,7 @@
 
 #include "Thread.h"
 
-#include <MDK/MasterServerMDK.h>
+#include <MDK/ModuleEntryPoint.h>
 
 #include <string>
 #include <map>
@@ -82,7 +82,7 @@ public:
 		Description: Get the thread name
 		Return: the thread name
 	*/
-	const char *GetName();
+	inline const char *GetName() { return m_szName; }
 	
 	/*
 		Function: GetDatabaseStatus
@@ -99,8 +99,7 @@ private:
 
 	ModuleMain m_module;
 
-	mdk_mysql m_connection;
-	bool m_database_disabled;
+	CDatabase* m_database;
 
 	void UpdateThreadInformation();
 };

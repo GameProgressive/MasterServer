@@ -18,6 +18,8 @@
 */
 #include "ModuleManager.h"
 
+#include <MDK/Utility.h>
+
 CModuleManager::CModuleManager()
 {
 }
