@@ -131,8 +131,4 @@ char CConfig::m_szDBName[MAX_INI_BUFFER+1] = {0};
 char CConfig::m_szDBIP[MAX_INI_BUFFER+1] = {0};
 bool CConfig::m_bDBEnabled = false;
 
-#ifdef __MARIADB__
 EDatabaseType CConfig::m_eDatabaseType = DATABASE_TYPE_MARIADB;
-#elif defined(__SQLITE__)
-EDatabaseType CConfig::m_eDatabaseType = DATABASE_TYPE_SQLITE;
-#endif
