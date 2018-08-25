@@ -25,6 +25,7 @@
 #include <string>
 
 #include <stdlib.h>
+#include <string.h>
 #include <time.h>
 
 #if defined(_WIN32) && defined(_DEBUG) && defined(HAVE_VLD_H)

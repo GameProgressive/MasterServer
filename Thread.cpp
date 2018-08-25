@@ -1,6 +1,10 @@
 #include "Thread.h"
 #include "MSConfig.h"
 
+#ifndef _WIN32
+#include <signal.h>
+#endif
+
 CThread::CThread()
 {
 #ifdef _WIN32
@@ -22,7 +26,7 @@ CThread::~CThread()
 #ifdef _WIN32
 void CThread::StartThread(LPTHREAD_START_ROUTINE m_cbMain, void* m_args)
 #else
-void CThread::StartThread(void*(*)(void*) m_cbMain, void* m_args)
+void CThread::StartThread(void*(* m_cbMain)(void*), void* m_args)
 #endif
 {
 	// Create the module thread
@@ -85,10 +89,10 @@ unsigned long CThread::GetExitCode()
 
 void CThread::UpdateThreadInformation()
 {
+#ifdef _WIN32
 	if (!m_handle)
 		return;
 
-#ifdef _WIN32
 	if (!GetExitCodeThread(m_handle, &m_exitCode))
 		return;
 

@@ -20,6 +20,7 @@
 #include "MSConfig.h"
 
 #include <stdio.h>
+#include <string.h>
 
 #include <MDK/Utility.h>
 
@@ -84,7 +85,8 @@ bool CModule::Load(const char *name)
 #endif
 	
 	// Save the name
-	strncpy_s(m_szName, sizeof(m_szName), name, MAX_MODULENAME);
+	strncpy(m_szName, name, sizeof(m_szName));
+	m_szName[sizeof(m_szName) - 1] = '\0';
 
 	// Load the Dynamic library
 #ifdef _WIN32
