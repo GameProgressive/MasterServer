@@ -55,5 +55,5 @@ if (WIN32)
 endif()
 
 add_executable(MasterServer ${SOURCES})
-target_link_libraries(MasterServer MDK)
+target_link_libraries(MasterServer MDK ${CMAKE_DL_LIBS})
 #set_target_properties(MasterServer PROPERTIES LINK_FLAGS "/MANIFESTUAC:\"level='requireAdministrator' uiAccess='false'\"")
