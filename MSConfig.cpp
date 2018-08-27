@@ -22,6 +22,8 @@
 
 #include <stdio.h>
 
+#include <string.h>
+
 bool CConfig::Load(CModuleManager *mngr, const char *name)
 {
 	// Create an INI instance
@@ -47,20 +49,27 @@ bool CConfig::Load(CModuleManager *mngr, const char *name)
 		if (m_DBPort < 0 || m_DBPort > 65535)
 			m_DBPort = 3306;
 
-		strncpy_s(m_szDBName, sizeof(m_szDBName), reader.Get("Database", "Name", "masterserver").c_str(), MAX_INI_BUFFER);
-		strncpy_s(m_szDBPass, sizeof(m_szDBPass), reader.Get("Database", "Password", "").c_str(), MAX_INI_BUFFER);
-		strncpy_s(m_szDBUser, sizeof(m_szDBUser), reader.Get("Database", "Username", "masterserver").c_str(), MAX_INI_BUFFER);
-		strncpy_s(m_szDBHost, sizeof(m_szDBHost), reader.Get("Database", "Host", "localhost").c_str(), MAX_INI_BUFFER);
-		strncpy_s(m_szDBSock, sizeof(m_szDBSock), reader.Get("Database", "Socket", "").c_str(), MAX_INI_BUFFER);
+		strncpy(m_szDBName, reader.Get("Database", "Name", "masterserver").c_str(), sizeof(m_szDBName));
+		m_szDBName[sizeof(m_szDBName) - 1] = '\0';
+		strncpy(m_szDBPass, reader.Get("Database", "Password", "").c_str(), sizeof(m_szDBPass));
+		m_szDBPass[sizeof(m_szDBPass) - 1] = '\0';
+		strncpy(m_szDBUser, reader.Get("Database", "Username", "masterserver").c_str(), sizeof(m_szDBUser));
+		m_szDBUser[sizeof(m_szDBUser) - 1] = '\0';
+		strncpy(m_szDBHost, reader.Get("Database", "Host", "localhost").c_str(), sizeof(m_szDBHost));
+		m_szDBHost[sizeof(m_szDBHost) - 1] = '\0';
+		strncpy(m_szDBSock, reader.Get("Database", "Socket", "").c_str(), sizeof(m_szDBSock));
+		m_szDBSock[sizeof(m_szDBSock) - 1] = '\0';
 
-		strncpy_s(dbType, sizeof(dbType), reader.Get("Database", "Type", "MariaDB").c_str(), MAX_INI_BUFFER);
+		strncpy(dbType, reader.Get("Database", "Type", "MariaDB").c_str(), sizeof(dbType));
+		dbType[sizeof(dbType) - 1] = '\0';
 
 		if (strcmp("MariaDB", dbType) == 0)
 			m_eDatabaseType = DATABASE_TYPE_MARIADB;
 		else if (strcmp("SQLite", dbType) == 0)
 			m_eDatabaseType = DATABASE_TYPE_SQLITE;
 		
-		strncpy_s(m_szDBIP, sizeof(m_szDBIP), reader.Get("Server", "DefaultIP", "localhost").c_str(), MAX_INI_BUFFER);
+		strncpy(m_szDBIP, reader.Get("Server", "DefaultIP", "localhost").c_str(), sizeof(m_szDBIP));
+		m_szDBIP[sizeof(m_szDBIP) - 1] = '\0';
 		m_bDBEnabled = true;
 	}
 	else
@@ -70,7 +79,7 @@ bool CConfig::Load(CModuleManager *mngr, const char *name)
 	while (bC)
 	{
 		char mn[15];
-		_snprintf_s(mn, sizeof(mn), 15, "%u", i);
+		snprintf(mn, sizeof(mn), "%u", i);
 
 		// Try to get the module name
 		str = reader.Get("Modules", std::string(mn), "NOT_FOUND");

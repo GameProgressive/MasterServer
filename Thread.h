@@ -43,7 +43,7 @@ public:
 #ifdef _WIN32
 	void StartThread(LPTHREAD_START_ROUTINE m_cbMain, void* m_args);
 #else
-	void StartThread(void*(*)(void*) m_cbMain, void* m_args);
+	void StartThread(void*(*m_cb_main)(void*), void* m_args);
 #endif
 	
 	/*
