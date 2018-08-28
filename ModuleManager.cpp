@@ -74,14 +74,14 @@ bool CModuleManager::LoadMSModule(const char *name, ModuleConfigMap cfg)
 	return true;
 }
 
-void CModuleManager::Start()
+void CModuleManager::Start(CDatabase* db)
 {
 	size_t i = 0;
 
 	for (; i < m_vModules.size(); i++)
 	{
 		LOG_INFO("Module", "Starting %s...", m_vModules.at(i)->GetName());
-		m_vModules.at(i)->Start();
+		m_vModules.at(i)->Start(db);
 	}
 }
 

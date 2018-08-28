@@ -15,6 +15,7 @@
 
 #include "Thread.h"
 
+#include <MDK/Database.h>
 #include <MDK/ModuleEntryPoint.h>
 
 #include <string>
@@ -61,8 +62,10 @@ public:
 	/*
 		Function: Start
 		Description: Starts the module
+		Parameters:
+			db => A pointer to a current database connection, pass NULL to let the module create one by himself
 	*/
-	void Start();
+	void Start(CDatabase* db);
 
 	/*
 		Function: Stop

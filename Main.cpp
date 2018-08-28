@@ -63,7 +63,7 @@ int main()
 {
 	// Create the main instances
 	CModuleManager mm;
-	//CDatabase db;
+	CDatabase* db = NULL;
 	
 	// We use this variable for console input
 	// I defined this here, so we won't create
@@ -81,9 +81,19 @@ int main()
 		ConsolePause();
 		return 0;
 	}
+	
+	if (CConfig::GetDatabaseType() == DATABASE_TYPE_SQLITE)
+	{
+		db = new CDatabase();
+		if (!db->Connect(CConfig::GetDatabaseType(), NULL, 0, NULL, CConfig::GetDatabaseName(), NULL))
+		{
+			ConsolePause();
+			return 0;
+		}
+	}
 
 	// Start our modules
-	mm.Start();
+	mm.Start(db);
 
 	LOG_INFO("MasterServer", "Server Started!");
 	LOG_INFO("MasterServer", "Type \"help\" for the list of commands avaiable.");

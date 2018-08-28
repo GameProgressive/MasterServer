@@ -111,7 +111,7 @@ bool CModule::Load(const char *name)
 	return true;
 }
 
-void CModule::Start()
+void CModule::Start(CDatabase* db)
 {
 	// Retrive bind ip and bind port
 	{
@@ -148,17 +148,23 @@ void CModule::Start()
 		
 		if (!database_disabled)
 		{
-			m_database = new CDatabase();
-			
-			if (CConfig::GetDatabaseSocket()[0] != '\0')
-			{
-				if (m_database->Connect(CConfig::GetDatabaseType(), CConfig::GetDatabaseSocket(), -1, CConfig::GetDatabaseUsername(), CConfig::GetDatabaseName(), CConfig::GetDatabasePassword()))
-					m_module.db = m_database;
-			}
+			if (db != NULL)
+				m_database = db;
 			else
+				m_database = new CDatabase();
+			
+			if (m_database->GetDatabaseType() == DATABASE_TYPE_MARIADB)
 			{
-				if (m_database->Connect(CConfig::GetDatabaseType(), CConfig::GetDatabaseHost(), CConfig::GetDatabasePort(), CConfig::GetDatabaseUsername(), CConfig::GetDatabaseName(), CConfig::GetDatabasePassword()))
-					m_module.db = m_database;
+				if (CConfig::GetDatabaseSocket()[0] != '\0')
+				{
+					if (m_database->Connect(CConfig::GetDatabaseType(), CConfig::GetDatabaseSocket(), -1, CConfig::GetDatabaseUsername(), CConfig::GetDatabaseName(), CConfig::GetDatabasePassword()))
+						m_module.db = m_database;
+				}
+				else
+				{
+					if (m_database->Connect(CConfig::GetDatabaseType(), CConfig::GetDatabaseHost(), CConfig::GetDatabasePort(), CConfig::GetDatabaseUsername(), CConfig::GetDatabaseName(), CConfig::GetDatabasePassword()))
+						m_module.db = m_database;
+				}
 			}
 		}
 	}

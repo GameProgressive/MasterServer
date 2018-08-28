@@ -50,7 +50,7 @@ public:
 		Function: Start
 		Description: Start all the modules
 	*/
-	void Start();
+	void Start(CDatabase* db);
 
 	/*
 		Function: Stop
