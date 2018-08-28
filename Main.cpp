@@ -122,6 +122,9 @@ int main()
 	// Stop the modules
 	mm.Stop();
 
+	if (db)
+		delete db;
+
 	ConsolePause();
 	return 0;
 }

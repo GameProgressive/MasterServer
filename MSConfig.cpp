@@ -43,8 +43,6 @@ bool CConfig::Load(CModuleManager *mngr, const char *name)
 		if (m_DBPort < 0 || m_DBPort > 65535)
 			m_DBPort = 3306;
 
-		strncpy(m_szDBName, reader.Get("Database", "Name", "masterserver").c_str(), sizeof(m_szDBName));
-		m_szDBName[sizeof(m_szDBName) - 1] = '\0';
 		strncpy(m_szDBPass, reader.Get("Database", "Password", "").c_str(), sizeof(m_szDBPass));
 		m_szDBPass[sizeof(m_szDBPass) - 1] = '\0';
 		strncpy(m_szDBUser, reader.Get("Database", "Username", "masterserver").c_str(), sizeof(m_szDBUser));
@@ -61,6 +59,13 @@ bool CConfig::Load(CModuleManager *mngr, const char *name)
 			m_eDatabaseType = DATABASE_TYPE_MARIADB;
 		else if (strcmp("SQLite", dbType) == 0)
 			m_eDatabaseType = DATABASE_TYPE_SQLITE;
+
+		if (m_eDatabaseType == DATABASE_TYPE_MARIADB)
+			strncpy(m_szDBName, reader.Get("Database", "Name", "masterserver").c_str(), sizeof(m_szDBName));
+		else
+			strncpy(m_szDBName, reader.Get("Database", "Name", "masterserver.db").c_str(), sizeof(m_szDBName));
+
+		m_szDBName[sizeof(m_szDBName) - 1] = '\0';
 		
 		strncpy(m_szDBIP, reader.Get("Server", "DefaultIP", "localhost").c_str(), sizeof(m_szDBIP));
 		m_szDBIP[sizeof(m_szDBIP) - 1] = '\0';

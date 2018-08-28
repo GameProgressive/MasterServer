@@ -166,6 +166,8 @@ void CModule::Start(CDatabase* db)
 						m_module.db = m_database;
 				}
 			}
+			else
+				m_module.db = m_database;
 		}
 	}
 	
@@ -189,7 +191,7 @@ void CModule::Stop()
 	StopThread();
 	
 	// Close MySQL connection
-	if (m_database)
+	if (m_database && m_database->GetDatabaseType() == DATABASE_TYPE_MARIADB)
 	{
 		m_database->Disconnect();
 		delete m_database;
