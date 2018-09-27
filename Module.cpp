@@ -30,16 +30,11 @@
 
 CModule::CModule()
 {
-	m_cbConfig = NULL;
+	m_szName[0] = '\0';
+	m_lpServer = NULL;
 	m_cbMain = NULL;
-
-	m_exitCode = 0;
-
-	m_module.ip = NULL;
-	m_module.port = 0;
-	m_module.db = NULL;
-
-	m_database = NULL;
+	m_lpDatabase = NULL;
+	m_lpDLL = NULL;
 }
 
 CModule::~CModule()
@@ -47,23 +42,22 @@ CModule::~CModule()
 	Stop();
 	
 	// Free Dynamic Library
-	if (m_lpThread)
+	if (m_lpDLL)
 	{
 #ifdef _WIN32
-		FreeLibrary(m_lpThread);
+		FreeLibrary(m_lpDLL);
 #else
-		dlclose(m_lpThread);
+		dlclose(m_lpDLL);
 #endif
 	}
 }
 
 bool CModule::Load(const char *name, ModuleConfigMap cfg)
 {
-	m_module.cfg = cfg;
-
+	m_cfg = cfg;
+	
 	return Load(name);
 }
-
 
 bool CModule::Load(const char *name)
 {
@@ -88,12 +82,12 @@ bool CModule::Load(const char *name)
 
 	// Load the Dynamic library
 #ifdef _WIN32
-	m_lpThread = LoadLibrary(dllName.c_str());
+	m_lpDLL = LoadLibrary(dllName.c_str());
 #else
-	m_lpThread = dlopen(dllName.c_str(), RTLD_LAZY);
+	m_lpDLL = dlopen(dllName.c_str(), RTLD_LAZY);
 #endif
 
-	if (!m_lpThread)
+	if (!m_lpDLL)
 	{
 		LOG_ERROR("Module", "Cannot find library %s!", m_szName);
 		return false;
@@ -101,9 +95,9 @@ bool CModule::Load(const char *name)
 
 	// Load the functions
 #ifdef _WIN32
-	m_cbMain = (Module_EntryPoint)GetProcAddress(m_lpThread, "MDKModule");
+	m_cbMain = (Module_EntryPoint)GetProcAddress(m_lpDLL, "MDKModule");
 #else
-	m_cbMain = (Module_EntryPoint)dlsym(m_lpThread, "MDKModule");
+	m_cbMain = (Module_EntryPoint)dlsym(m_lpDLL, "MDKModule");
 #endif
 
 	if (!m_cbMain)
@@ -111,38 +105,49 @@ bool CModule::Load(const char *name)
 		LOG_ERROR("Module", "Invalid library %s!", m_szName);
 		return false;
 	}
+	
+	m_lpServer = m_cbMain();
 
 	return true;
 }
 
-void CModule::Start(CDatabase* db)
+bool CModule::IsRunning()
 {
+	if (m_lpServer)
+		return m_lpServer->IsRunning();
+	
+	return false;
+}
+
+bool CModule::Start(CDatabase* db)
+{
+	int port = -1;
+	const char *ip = NULL;
+	
 	// Retrive bind ip and bind port
 	{
-		ModuleConfigMap::iterator it = m_module.cfg.find("Port");
+		ModuleConfigMap::iterator it = m_cfg.find("Port");
 
-		if (it == m_module.cfg.end())
-			m_module.port = -1;
+		if (it != m_cfg.end())
+			port = atoi(it->second.c_str());
+
+		it = m_cfg.find("BindIP");
+
+		if (it == m_cfg.end())
+			ip = (char*)CConfig::GetDefaultIP();
 		else
-			m_module.port = atoi(it->second.c_str());
-
-		it = m_module.cfg.find("BindIP");
-
-		if (it == m_module.cfg.end())
-			m_module.ip = (char*)CConfig::GetDefaultIP();
-		else
-			m_module.ip = (char*)it->second.c_str();
+			ip = (char*)it->second.c_str();
 	}
 	
 	// Connect to MySQL server
 	if (CConfig::IsDatabaseEnabled())
 	{
 		bool database_disabled = false;
-		ModuleConfigMap::iterator it = m_module.cfg.find("DisableMySQL");
+		ModuleConfigMap::iterator it = m_cfg.find("DisableMySQL");
 		
-		m_module.db = NULL;
+		m_lpDatabase = db;
 		
-		if (it != m_module.cfg.end())
+		if (it != m_cfg.end())
 		{
 			if (it->second.compare("1") == 0)
 			{
@@ -150,56 +155,60 @@ void CModule::Start(CDatabase* db)
 			}
 		}
 		
-		if (!database_disabled)
+		if (database_disabled == false && m_lpDatabase == NULL)
 		{
-			if (db != NULL)
-				m_database = db;
-			else
-				m_database = new CDatabase();
+			m_lpDatabase = new CDatabase();
 			
-			if (m_database->GetDatabaseType() == DATABASE_TYPE_MARIADB)
+			if (CConfig::GetDatabaseType() == DATABASE_TYPE_MARIADB)
 			{
 				if (CConfig::GetDatabaseSocket()[0] != '\0')
 				{
-					if (m_database->Connect(CConfig::GetDatabaseType(), CConfig::GetDatabaseSocket(), -1, CConfig::GetDatabaseUsername(), CConfig::GetDatabaseName(), CConfig::GetDatabasePassword()))
-						m_module.db = m_database;
+					if (m_lpDatabase->Connect(CConfig::GetDatabaseType(), CConfig::GetDatabaseSocket(), -1, CConfig::GetDatabaseUsername(), CConfig::GetDatabaseName(), CConfig::GetDatabasePassword()))
+						return false;
 				}
 				else
 				{
-					if (m_database->Connect(CConfig::GetDatabaseType(), CConfig::GetDatabaseHost(), CConfig::GetDatabasePort(), CConfig::GetDatabaseUsername(), CConfig::GetDatabaseName(), CConfig::GetDatabasePassword()))
-						m_module.db = m_database;
+					if (!m_lpDatabase->Connect(CConfig::GetDatabaseType(), CConfig::GetDatabaseHost(), CConfig::GetDatabasePort(), CConfig::GetDatabaseUsername(), CConfig::GetDatabaseName(), CConfig::GetDatabasePassword()))
+						return false;
 				}
 			}
-			else
-				m_module.db = m_database;
 		}
 	}
 	
-#ifdef _WIN32
-	StartThread((LPTHREAD_START_ROUTINE)m_cbMain, (void*)&m_module);
-#else
-	StartThread((void*(*)(void*))m_cbMain, (void*)&m_module);	
-#endif
+	return m_lpServer->Start(ip, port, m_lpDatabase, m_cfg);
 }
 
 const char *CModule::GetDatabaseStatus()
 {
-	if (!m_database)
+	if (!m_lpDatabase)
 		return "Disabled";
 	
-	return m_database->IsConnected() ? "Connected " : "Disconnected";
+	return m_lpDatabase->IsConnected() ? "Connected " : "Disconnected";
 }
 
 void CModule::Stop()
 {
-	StopThread();
-	
-	// Close MySQL connection
-	if (m_database && m_database->GetDatabaseType() == DATABASE_TYPE_MARIADB)
+	if (m_lpServer)
 	{
-		m_database->Disconnect();
-		delete m_database;
+		m_lpServer->Stop();
+		delete m_lpServer;
+		m_lpServer = NULL;
 	}
 	
-	m_database = NULL;
+	// Close MySQL connection
+	if (m_lpDatabase && m_lpDatabase->GetDatabaseType() == DATABASE_TYPE_MARIADB)
+	{
+		m_lpDatabase->Disconnect();
+		delete m_lpDatabase;
+	}
+	
+	m_lpDatabase = NULL;
+}
+
+int CModule::GetExitCode()
+{
+	if (m_lpServer == NULL)
+		return ERROR_NONE;
+	
+	return m_lpServer->GetExitCode();
 }

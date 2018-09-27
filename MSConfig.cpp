@@ -82,7 +82,12 @@ bool CConfig::Load(CModuleManager *mngr, const char *name)
 	while (bC)
 	{
 		char mn[15];
+		
+#ifdef __64BIT__
+		snprintf(mn, sizeof(mn), "%lu", i);
+#else
 		snprintf(mn, sizeof(mn), "%u", i);
+#endif
 
 		// Try to get the module name
 		str = reader.Get("Modules", std::string(mn), "NOT_FOUND");

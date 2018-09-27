@@ -85,7 +85,10 @@ void CModuleManager::Start(CDatabase* db)
 	for (; i < m_vModules.size(); i++)
 	{
 		LOG_INFO("Module", "Starting %s...", m_vModules.at(i)->GetName());
-		m_vModules.at(i)->Start(db);
+		if (!m_vModules.at(i)->Start(db))
+		{
+			LOG_ERROR("Module", "Unable to start module %s!", m_vModules.at(i)->GetName());
+		}
 	}
 }
 

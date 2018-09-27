@@ -17,26 +17,19 @@
 #ifndef _MASTERSERVER_MODULE_H
 #define _MASTERSERVER_MODULE_H
 
-#include "Thread.h"
-
-#include <MDK/Database.h>
 #include <MDK/ModuleEntryPoint.h>
-
-#include <string>
-#include <map>
 
 // MAX_PATH in Windows
 #define MAX_MODULENAME 255
 
 // Callbacks and typedef
-typedef int (* Module_EntryPoint)(void*);
-typedef bool (* Module_ConfigFunction)(ModuleConfigMap);
+typedef CThreadServer* (* Module_EntryPoint)(void);
 
 /*
 	This class rappresents a dynamic module that will
 	be loaded into RetroSpy Main Server
 */
-class CModule : public CThread
+class CModule
 {
 public:
 	CModule();
@@ -69,7 +62,7 @@ public:
 		Parameters:
 			db => A pointer to a current database connection, pass NULL to let the module create one by himself
 	*/
-	void Start(CDatabase* db);
+	bool Start(CDatabase* db);
 
 	/*
 		Function: Stop
@@ -91,18 +84,24 @@ public:
 		Return: the database status
 	*/
 	const char *GetDatabaseStatus();
+	
+	int GetExitCode();
+	bool IsRunning();
 
 private:
 	char m_szName[MAX_MODULENAME+1];
-
 	Module_EntryPoint m_cbMain;
-	Module_ConfigFunction m_cbConfig;
+	
+	CDatabase* m_lpDatabase;
+	CThreadServer* m_lpServer;
+	ModuleConfigMap m_cfg;
 
-	ModuleMain m_module;
+#ifdef _WIN32
+	HANDLE* m_lpDLL;
+#else
+	void* m_lpDLL;
+#endif
 
-	CDatabase* m_database;
-
-	void UpdateThreadInformation();
 };
 
 #endif

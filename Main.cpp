@@ -156,9 +156,6 @@ const char* ExitCodeToString(unsigned long ecode)
 	case ERROR_NONE:
 		return "No Error";
 		break;
-	case ERROR_MYSQL_POINTER:
-		return "Invalid MySQL Connection";
-		break;
 	case ERROR_BIND_ERROR:
 		return "Unable to Bind";
 		break;

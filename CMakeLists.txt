@@ -45,8 +45,6 @@ ${CMAKE_CURRENT_LIST_DIR}/Module.cpp
 ${CMAKE_CURRENT_LIST_DIR}/Module.h
 ${CMAKE_CURRENT_LIST_DIR}/ModuleManager.cpp
 ${CMAKE_CURRENT_LIST_DIR}/ModuleManager.h
-${CMAKE_CURRENT_LIST_DIR}/Thread.cpp
-${CMAKE_CURRENT_LIST_DIR}/Thread.h
 )
 
 if (WIN32)
@@ -57,3 +55,7 @@ endif()
 add_executable(MasterServer ${SOURCES})
 target_link_libraries(MasterServer MDK ${CMAKE_DL_LIBS})
 #set_target_properties(MasterServer PROPERTIES LINK_FLAGS "/MANIFESTUAC:\"level='requireAdministrator' uiAccess='false'\"")
+
+if (RS_64BIT EQUAL 1)
+	target_compile_definitions(MasterServer PRIVATE __64BIT__)
+endif()
