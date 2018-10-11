@@ -97,7 +97,7 @@ private:
 	ModuleConfigMap m_cfg;
 
 #ifdef _WIN32
-	HANDLE* m_lpDLL;
+	HMODULE m_lpDLL;
 #else
 	void* m_lpDLL;
 #endif
