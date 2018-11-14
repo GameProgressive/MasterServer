@@ -163,7 +163,7 @@ bool CModule::Start(CDatabase* db)
 			{
 				if (CConfig::GetDatabaseSocket()[0] != '\0')
 				{
-					if (m_lpDatabase->Connect(CConfig::GetDatabaseType(), CConfig::GetDatabaseSocket(), -1, CConfig::GetDatabaseUsername(), CConfig::GetDatabaseName(), CConfig::GetDatabasePassword()))
+					if (!m_lpDatabase->Connect(CConfig::GetDatabaseType(), CConfig::GetDatabaseSocket(), -1, CConfig::GetDatabaseUsername(), CConfig::GetDatabaseName(), CConfig::GetDatabasePassword()))
 						return false;
 				}
 				else
